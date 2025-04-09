@@ -1,0 +1,153 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: black;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+
+main {
+    max-width: 1500px;
+    width: 95%;
+    margin: 30px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-top: 100px;
+}
+
+main .card {
+    max-width: 250px;
+    flex: 1 1 210px;
+    text-align: center;
+    height: 400px;
+    border: 1px solid lightgray;
+    margin: 20px;
+    transition: transform 0.3s ease; 
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+main .card:hover {
+    transform: scale(1.03); 
+}
+
+main .card.visible {
+    opacity: 2;
+    transform: translateY(1);
+}
+
+main .card .image {
+    height: 50%;
+    margin-bottom: 20px;
+}
+
+main .card .image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+main .card .caption {
+    padding-left: 1em;
+    text-align: left;
+    line-height: 1.5em;
+    height: auto; 
+}
+
+main .card .caption p {
+    font-size: 1.5rem;
+}
+
+.discount {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow:clip; 
+}
+
+.product_name{
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow:clip;
+}
+del {
+    text-decoration: underline;
+}
+
+main .card .caption .rate {
+    display: flex;
+}
+
+main .card .caption .rate i {
+    color: gold;
+    margin-left: 2px;
+}
+
+main .card a {
+    width: 50%;
+}
+
+main .card a {
+    border: 2px solid black;
+    padding: 1em;
+    width: 80%;
+    cursor: pointer;
+    margin-top: 2em;
+    font-weight: bold;
+    position: relative;
+}
+
+main .card button:hover {
+    background-color: #83e2b9;
+}
+
+.container .input {
+    border: 0;
+    outline: none;
+    color: #8b7d77;
+}
+
+/* Media Queries pour la responsivité */
+@media (max-width: 1200px) {
+    main {
+        justify-content: center;
+    }
+
+    main .card {
+        max-width: 45%;
+        flex: 1 1 45%;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    main .card {
+        max-width: 80%;
+        flex: 1 1 80%;
+    }
+}
+
+@media (max-width: 480px) {
+    main .card {
+        max-width: 95%;
+        flex: 1 1 95%;
+    }
+
+    main .card .caption p {
+        font-size: 1.2rem;
+    }
+
+    main .card button {
+        width: 90%;
+    }
+}

@@ -1,0 +1,166 @@
+
+.carte_page{
+    margin-top: 80px;
+    margin-left: -10px;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse; 
+}
+
+.carte_info{
+    display: flex;
+    flex-wrap: wrap; 
+}
+
+th{
+    text-align: left;
+    padding: 5px;
+    color: black;
+    background: #83e2b6;
+    font-weight: normal;
+}
+
+td{
+    padding: 10px 5px;
+}
+
+td input{
+    width: 40px;
+    height: 30px;
+    padding: 5px;
+}
+
+td a{
+    color: black;
+    font-size: 12px;
+    background: #83e2b6;
+    /* background: #cfcfcf; */
+
+}
+
+td img{
+    width: 80px; 
+    height: 80px;
+    margin-right: 10px; 
+}
+
+
+td:last-child{
+    text-align: right;
+}
+
+th:last-child{
+    text-align: right;
+}
+
+
+@media (max-width: 1024px) {
+    .carte_page {
+        margin-top: 100px;
+        margin-left: 0;
+    }
+    .carte_info {
+        flex-direction: column;
+        align-items: center;
+    }
+    td img {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar a {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .carte_page {
+        margin-top: 100px;
+        margin-left: 0;
+    }
+    .carte_info {
+        flex-direction: column;
+        align-items: center;
+    }
+    td img {
+        width: 60px;
+        height: 60px;
+    }
+    td input {
+        width: 35px;
+        height: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 10px 2%;
+    }
+
+    .navbar a {
+        font-size: 14px;
+        margin-left: 10px;
+    }
+    .carte_page {
+        margin-top: 100px;
+        margin-left: 0;
+    }
+    .carte_info {
+        flex-direction: column;
+        align-items: center;
+    }
+    td img {
+        width: 50px;
+        height: 50px;
+    }
+    td input {
+        width: 30px;
+        height: 20px;
+    }
+    
+}
+
+@media (max-width: 375px) {
+    .carte_page {
+        margin-top: 100px;
+        margin-left: 0;
+    }
+    .carte_info {
+        flex-direction: column;
+        align-items: center;
+    }
+    td img {
+        width: 40px;
+        height: 40px;
+    }
+    td input {
+        width: 25px;
+        height: 15px;
+    }
+    
+}
+
+@media (max-width: 1200px) {
+    .header {
+        padding: 20px 5%;
+    }
+
+    .navbar a {
+        font-size: 16px;
+        margin-left: 20px;
+    }
+
+}
