@@ -249,3 +249,11 @@ constant, et message d'erreur unique à la connexion pour ne pas révéler quels
    `SameSite=None`, il ne sera pas transmis en HTTP simple.
 5. Servez l'application derrière un reverse proxy (`trust proxy` est déjà activé) et prévoyez
    une sauvegarde régulière de `server/uploads/`, qui contient les images téléversées.
+
+<img width="1905" height="948" alt="image" src="https://github.com/user-attachments/assets/814204ea-8b03-41e5-aa7b-ded912fce2b7" />
+<img width="1626" height="989" alt="image" src="https://github.com/user-attachments/assets/90b0fa13-7ca7-4b17-8ade-acb703f9359c" />
+<img width="1565" height="992" alt="image" src="https://github.com/user-attachments/assets/0e432e15-7009-4381-bbe7-cb78c45a7de7" />
+<img width="1426" height="992" alt="image" src="https://github.com/user-attachments/assets/860fedd1-8a4a-4ea2-a4ca-109e01bc74ad" />
+<img width="1576" height="992" alt="image" src="https://github.com/user-attachments/assets/db85cf64-d44a-4cef-b99f-dfcbb4b06a40" />
+<img width="1530" height="963" alt="image" src="https://github.com/user-attachments/assets/5683ecf3-9a46-4432-aa77-f11cca6d7d3b" />
+<img width="1677" height="994" alt="image" src="https://github.com/user-attachments/assets/994c7f08-df16-4dda-9a79-6e931337ddc2" />
