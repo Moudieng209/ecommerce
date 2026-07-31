@@ -4,117 +4,107 @@ import { api } from '../api/client';
 import CarteProduit from '../components/CarteProduit';
 import Revelation from '../components/Revelation';
 import { Bouton, CLASSES_SAISIE, EtatVide } from '../components/ui';
-
-// Catalogue : recherche, filtre par categorie et par prix, tri et pagination.
-// Tous les criteres vivent dans l'URL, ce qui rend chaque resultat partageable
-// et rejouable par le bouton « precedent » du navigateur.
+import { CATEGORIES_ENRICHIES, PRODUITS_ENRICHIS } from '../data/produitsData';
 
 const TRIS = [
   { valeur: 'recent', libelle: 'Plus récents' },
   { valeur: 'prix-croissant', libelle: 'Prix croissant' },
   { valeur: 'prix-decroissant', libelle: 'Prix décroissant' },
+  { valeur: 'note', libelle: 'Meilleures notes' },
   { valeur: 'nom', libelle: 'Nom (A-Z)' },
 ];
 
 export default function Produits() {
   const [parametres, setParametres] = useSearchParams();
 
-  const [produits, setProduits] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
-  const [chargement, setChargement] = useState(true);
+  const [produits, setProduits] = useState(PRODUITS_ENRICHIS);
+  const [categories, setCategories] = useState(CATEGORIES_ENRICHIES);
+  const [chargement, setChargement] = useState(false);
+  const [vueGrille, setVueGrille] = useState(true);
 
-  const recherche = parametres.get('recherche') ?? '';
-  const categorie = parametres.get('categorie') ?? '';
+  const recherche = parametres.get('recherche') || parametres.get('q') || '';
+  const categorieId = parametres.get('categorie') ?? '';
   const tri = parametres.get('tri') ?? 'recent';
-  const page = Number(parametres.get('page') ?? 1);
 
-  // Champ de recherche non controle par l'URL : il se met a jour a chaque frappe
-  // alors que l'URL n'est modifiee qu'apres une pause (anti-rebond plus bas).
   const [saisie, setSaisie] = useState(recherche);
 
   const majParametre = useCallback(
     (modifications) => {
       setParametres((precedents) => {
         const suivants = new URLSearchParams(precedents);
-
         for (const [cle, valeur] of Object.entries(modifications)) {
           if (valeur === '' || valeur === null || valeur === undefined) suivants.delete(cle);
           else suivants.set(cle, String(valeur));
         }
-
-        // Changer un filtre doit ramener a la premiere page, sinon on atterrit
-        // sur une page vide.
-        if (!('page' in modifications)) suivants.delete('page');
-
         return suivants;
       });
     },
     [setParametres],
   );
 
-  // Anti-rebond : on attend 350 ms de silence avant de lancer la recherche,
-  // plutot qu'une requete par caractere tape.
   useEffect(() => {
     const minuterie = setTimeout(() => {
       if (saisie !== recherche) majParametre({ recherche: saisie });
-    }, 350);
-
+    }, 300);
     return () => clearTimeout(minuterie);
   }, [saisie, recherche, majParametre]);
 
   useEffect(() => {
     api
       .get('/categories')
-      .then((donnees) => setCategories(donnees.categories))
-      .catch(() => setCategories([]));
+      .then((donnees) => {
+        if (donnees.categories && donnees.categories.length > 0) setCategories(donnees.categories);
+      })
+      .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    let annule = false;
-    setChargement(true);
+  // Filtrage local dynamique
+  const produitsFiltres = PRODUITS_ENRICHIS.filter((p) => {
+    if (recherche) {
+      const q = recherche.toLowerCase();
+      const matchNom = p.nom.toLowerCase().includes(q);
+      const matchCat = p.categorie.toLowerCase().includes(q);
+      const matchDesc = p.description.toLowerCase().includes(q);
+      if (!matchNom && !matchCat && !matchDesc) return false;
+    }
 
-    const requete = new URLSearchParams({ page: String(page), parPage: '12', tri });
-    if (recherche) requete.set('recherche', recherche);
-    if (categorie) requete.set('categorie', categorie);
+    if (categorieId) {
+      if (p.categorie_id !== Number(categorieId)) {
+        // match fuzzy avec nom si categorieId n'est pas numerique
+        const catObj = CATEGORIES_ENRICHIES.find((c) => String(c.id) === String(categorieId));
+        if (!catObj || p.categorie !== catObj.nom) return false;
+      }
+    }
 
-    api
-      .get(`/produits?${requete}`)
-      .then((donnees) => {
-        if (annule) return;
-        setProduits(donnees.produits);
-        setPagination(donnees.pagination);
-      })
-      .catch(() => {
-        if (!annule) setProduits([]);
-      })
-      .finally(() => {
-        if (!annule) setChargement(false);
-      });
+    return true;
+  }).sort((a, b) => {
+    if (tri === 'prix-croissant') return a.prix - b.prix;
+    if (tri === 'prix-decroissant') return b.prix - a.prix;
+    if (tri === 'note') return (b.note || 0) - (a.note || 0);
+    if (tri === 'nom') return a.nom.localeCompare(b.nom);
+    return b.id - a.id;
+  });
 
-    return () => {
-      annule = true;
-    };
-  }, [recherche, categorie, tri, page]);
-
-  const filtresActifs = Boolean(recherche || categorie);
+  const filtresActifs = Boolean(recherche || categorieId);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14">
+      {/* En-tete Catalogue */}
       <Revelation className="max-w-2xl">
-        <span className="text-sm font-bold uppercase tracking-wider text-primary">Notre catalogue</span>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-on-surface md:text-4xl">
-          Tous nos produits
+        <span className="text-xs font-bold uppercase tracking-wider text-primary">Catalogue Produit</span>
+        <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-on-surface sm:text-4xl">
+          Explorez Notre Collection
         </h1>
-        <p className="mt-4 text-lg text-on-surface-variant">
-          {pagination.total} article{pagination.total > 1 ? 's' : ''} disponible
-          {pagination.total > 1 ? 's' : ''} — filtrez par rayon, prix ou mot-clé.
+        <p className="mt-2 text-xs sm:text-sm text-on-surface-variant">
+          {produitsFiltres.length} article{produitsFiltres.length > 1 ? 's' : ''} trouvé
+          {produitsFiltres.length > 1 ? 's' : ''} — livraison express sous 48h à Dakar & régions.
         </p>
       </Revelation>
 
-      {/* --- Barre de filtres --- */}
-      <div className="mt-10 rounded-2xl border border-outline-variant bg-surface-container-lowest p-4 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-[1.6fr_1fr_1fr_auto]">
+      {/* Barre de filtres & recherche */}
+      <div className="mt-8 rounded-2xl border border-outline-variant bg-surface-container-lowest p-4 shadow-sm space-y-3">
+        <div className="grid gap-3 md:grid-cols-[1.6fr_1fr_1fr_auto_auto]">
+          {/* Input recherche */}
           <div className="relative">
             <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-outline">
               search
@@ -122,40 +112,64 @@ export default function Produits() {
             <input
               type="search"
               value={saisie}
-              onChange={(evenement) => setSaisie(evenement.target.value)}
-              placeholder="Rechercher un article…"
-              aria-label="Rechercher un article"
-              className="h-11 w-full rounded-xl border border-outline-variant bg-surface-container-low/50 pl-10 pr-3 text-sm text-on-surface placeholder:text-outline transition-colors focus:border-primary focus:outline-none"
+              onChange={(e) => setSaisie(e.target.value)}
+              placeholder="Rechercher une chemise, des sneakers, du parfum..."
+              className="h-11 w-full rounded-xl border border-outline-variant bg-surface-container-low pl-10 pr-3 text-xs sm:text-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none"
             />
           </div>
 
+          {/* Select categorie */}
           <select
-            value={categorie}
-            onChange={(evenement) => majParametre({ categorie: evenement.target.value })}
-            aria-label="Filtrer par catégorie"
-            className={`${CLASSES_SAISIE} mt-0 h-11 py-0`}
+            value={categorieId}
+            onChange={(e) => majParametre({ categorie: e.target.value })}
+            className={`${CLASSES_SAISIE} mt-0 h-11 py-0 text-xs sm:text-sm`}
           >
             <option value="">Toutes les catégories</option>
-            {categories.map((element) => (
-              <option key={element.id} value={element.id}>
-                {element.nom} ({element.nombre_produits})
+            {CATEGORIES_ENRICHIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.nom} ({cat.nombreArticles})
               </option>
             ))}
           </select>
 
+          {/* Select Tri */}
           <select
             value={tri}
-            onChange={(evenement) => majParametre({ tri: evenement.target.value })}
-            aria-label="Trier les résultats"
-            className={`${CLASSES_SAISIE} mt-0 h-11 py-0`}
+            onChange={(e) => majParametre({ tri: e.target.value })}
+            className={`${CLASSES_SAISIE} mt-0 h-11 py-0 text-xs sm:text-sm`}
           >
-            {TRIS.map((option) => (
-              <option key={option.valeur} value={option.valeur}>
-                {option.libelle}
+            {TRIS.map((t) => (
+              <option key={t.valeur} value={t.valeur}>
+                {t.libelle}
               </option>
             ))}
           </select>
 
+          {/* Switcher vue grille / liste */}
+          <div className="flex items-center gap-1 border border-outline-variant rounded-xl p-1 bg-surface-container-low">
+            <button
+              type="button"
+              onClick={() => setVueGrille(true)}
+              aria-label="Vue Grille"
+              className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+                vueGrille ? 'bg-primary text-on-primary shadow-sm' : 'text-outline hover:text-on-surface'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">grid_view</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setVueGrille(false)}
+              aria-label="Vue Liste"
+              className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+                !vueGrille ? 'bg-primary text-on-primary shadow-sm' : 'text-outline hover:text-on-surface'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">view_list</span>
+            </button>
+          </div>
+
+          {/* Bouton reset filtres */}
           {filtresActifs && (
             <Bouton
               variante="secondaire"
@@ -165,104 +179,77 @@ export default function Produits() {
                 setParametres(new URLSearchParams());
               }}
             >
-              Réinitialiser
+              Effacer
             </Bouton>
           )}
         </div>
+
+        {/* Pilules filtres actifs */}
+        {filtresActifs && (
+          <div className="flex flex-wrap items-center gap-2 border-t border-outline-variant/60 pt-3 text-xs">
+            <span className="font-bold text-outline">Filtres actifs :</span>
+            {recherche && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 text-on-primary-container font-bold">
+                "{recherche}"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSaisie('');
+                    majParametre({ recherche: null, q: null });
+                  }}
+                  className="hover:text-error"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
+            {categorieId && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container font-bold">
+                Catégorie #{categorieId}
+                <button
+                  type="button"
+                  onClick={() => majParametre({ categorie: null })}
+                  className="hover:text-error"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* --- Resultats --- */}
-      {chargement ? (
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="squelette h-80 rounded-2xl border border-outline-variant" aria-hidden />
-          ))}
-        </div>
-      ) : produits.length === 0 ? (
+      {/* Grille ou Liste de produits */}
+      {produitsFiltres.length === 0 ? (
         <div className="mt-10">
           <EtatVide
             icone="search_off"
-            titre="Aucun article ne correspond"
-            texte="Essayez avec d’autres mots-clés, ou retirez les filtres appliqués pour voir tout le catalogue."
+            titre="Aucun produit trouvé"
+            texte="Essayez avec d'autres mots-clés ou supprimez vos filtres pour réafficher le catalogue."
             action={
-              filtresActifs && (
-                <Bouton
-                  onClick={() => {
-                    setSaisie('');
-                    setParametres(new URLSearchParams());
-                  }}
-                >
-                  Voir tout le catalogue
-                </Bouton>
-              )
+              <Bouton
+                onClick={() => {
+                  setSaisie('');
+                  setParametres(new URLSearchParams());
+                }}
+              >
+                Réinitialiser le catalogue
+              </Bouton>
             }
           />
         </div>
       ) : (
-        <>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {produits.map((produit, index) => (
-              <Revelation key={produit.id} delai={(index % 4) * 80}>
-                <CarteProduit produit={produit} />
-              </Revelation>
-            ))}
-          </div>
-
-          {pagination.pages > 1 && (
-            <nav className="mt-12 flex items-center justify-center gap-2" aria-label="Pagination">
-              <Bouton
-                variante="secondaire"
-                taille="sm"
-                icone="chevron_left"
-                disabled={page <= 1}
-                onClick={() => majParametre({ page: page - 1 })}
-              >
-                Précédent
-              </Bouton>
-
-              <div className="flex items-center gap-1">
-                {Array.from({ length: pagination.pages }, (_, index) => index + 1)
-                  // Fenetre glissante autour de la page courante : au-dela de
-                  // sept pages, tout afficher deborderait sur mobile.
-                  .filter(
-                    (numero) =>
-                      numero === 1 ||
-                      numero === pagination.pages ||
-                      Math.abs(numero - page) <= 1,
-                  )
-                  .map((numero, index, liste) => (
-                    <span key={numero} className="flex items-center gap-1">
-                      {index > 0 && liste[index - 1] !== numero - 1 && (
-                        <span className="px-1 text-on-surface-variant">…</span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => majParametre({ page: numero })}
-                        aria-current={numero === page ? 'page' : undefined}
-                        className={`h-9 w-9 rounded-xl text-sm font-semibold transition-colors ${
-                          numero === page
-                            ? 'bg-primary text-on-primary'
-                            : 'border border-outline-variant text-on-surface hover:bg-surface-container-low'
-                        }`}
-                      >
-                        {numero}
-                      </button>
-                    </span>
-                  ))}
-              </div>
-
-              <Bouton
-                variante="secondaire"
-                taille="sm"
-                iconeApres="chevron_right"
-                disabled={page >= pagination.pages}
-                onClick={() => majParametre({ page: page + 1 })}
-              >
-                Suivant
-              </Bouton>
-            </nav>
-          )}
-        </>
+        <div
+          className={`mt-8 grid gap-6 ${
+            vueGrille ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'
+          }`}
+        >
+          {produitsFiltres.map((produit, index) => (
+            <Revelation key={produit.id} delai={(index % 4) * 60}>
+              <CarteProduit produit={produit} />
+            </Revelation>
+          ))}
+        </div>
       )}
     </div>
   );

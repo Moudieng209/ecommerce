@@ -1,71 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 /* =====================================================================
-   Systeme de design repris de la vitrine SenBus Pro : jetons de couleur
-   Material 3, typographie Inter, Material Symbols, et animations de
-   revelation au defilement. La palette est ici declinee sur le vert de
-   3MT-Shopping (#83e2b6) plutot que sur le bleu SenBus.
+   Système de Design Premium 3MT-Shopping - Luxe, Élégance & Ergonomie
+   Palette : Vert Émeraude Profond (#047857), Or Champagne (#d4af37)
+   Typographie : Plus Jakarta Sans & Outfit (Titres Haut de Gamme)
    ===================================================================== */
 
 @theme {
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Outfit", "Plus Jakarta Sans", sans-serif;
 
-  --color-primary: #0f7a53;
+  --color-primary: #047857;
+  --color-primary-dark: #064e3b;
   --color-on-primary: #ffffff;
-  --color-primary-container: #b3f0d5;
-  --color-on-primary-container: #00281a;
+  --color-primary-container: #d1fae5;
+  --color-on-primary-container: #022c22;
 
-  /* Rappel de l'or utilise par la boutique d'origine, pour les accents secondaires. */
-  --color-secondary: #8a5a00;
+  --color-secondary: #d97706;
+  --color-secondary-gold: #d4af37;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #ffddb0;
-  --color-on-secondary-container: #2c1700;
+  --color-secondary-container: #fef3c7;
+  --color-on-secondary-container: #451a03;
 
-  /* Vert menthe historique de la marque : badges, soulignements, points d'attention. */
-  --color-accent: #83e2b6;
+  --color-accent: #10b981;
 
-  --color-background: #f6fbf8;
-  --color-on-background: #0c1b14;
+  --color-background: #f8faf9;
+  --color-on-background: #0f172a;
 
-  --color-surface: #f6fbf8;
+  --color-surface: #f8faf9;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #eff6f2;
-  --color-surface-container: #e6efe9;
-  --color-surface-container-high: #dde9e3;
-  --color-surface-container-highest: #d4e3da;
+  --color-surface-container-low: #f0fdf4;
+  --color-surface-container: #e2e8f0;
+  --color-surface-container-high: #cbd5e1;
+  --color-surface-container-highest: #94a3b8;
 
-  --color-on-surface: #0c1b14;
-  --color-on-surface-variant: #3f4a44;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
 
-  --color-outline: #6f7b74;
-  --color-outline-variant: #c3cfc7;
+  --color-outline: #64748b;
+  --color-outline-variant: #e2e8f0;
 
-  --color-error: #ba1a1a;
+  --color-error: #dc2626;
   --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #410002;
+  --color-error-container: #fee2e2;
+  --color-on-error-container: #7f1d1d;
 
-  --color-succes: #1b6b3a;
-  --color-succes-container: #c8f0d5;
+  --color-succes: #15803d;
+  --color-succes-container: #dcfce7;
 }
 
 body {
   background-color: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
 }
 
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   font-family: "Material Symbols Outlined";
-  /* Sans cette regle, l'icone herite de la hauteur de ligne du texte et
-     desaligne verticalement les boutons. */
   line-height: 1;
   user-select: none;
 }
 
-/* --- Revelation des sections au defilement -------------------------- */
-/* Pilotee par le composant Revelation, qui pose « revelee » quand le bloc
-   entre dans le champ de vision. Courbe douce a l'arrivee : le bloc
-   decelere en se posant plutot que de s'arreter net. */
+/* --- Effets Premium (Glassmorphism, Dégradés Métalliques, Glows) --- */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #d97706 0%, #d4af37 50%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-emerald-gradient {
+  background: linear-gradient(135deg, #047857 0%, #10b981 50%, #065f46 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-glow:hover {
+  box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.35);
+}
+
+.emerald-glow:hover {
+  box-shadow: 0 10px 35px -10px rgba(4, 120, 87, 0.3);
+}
+
+/* --- Révélation des sections au défilement --- */
 .revelation {
   opacity: 0;
   transition:
@@ -93,8 +132,7 @@ body {
   transform: none;
 }
 
-/* --- Entree du hero au chargement ----------------------------------- */
-/* Le hero est visible d'emblee : il s'anime au chargement plutot qu'au defilement. */
+/* --- Entrée du hero --- */
 @keyframes entree-hero {
   from {
     opacity: 0;
@@ -112,18 +150,19 @@ body {
   animation-delay: var(--delai-entree, 0ms);
 }
 
-/* Respiration lente des visuels : la page reste vivante meme a l'arret. */
 @keyframes flottement {
+  0%, 100% {
+    transform: translateY(0px);
+  }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
 .flottement {
-  animation: flottement 6s ease-in-out infinite;
+  animation: flottement 5s ease-in-out infinite;
 }
 
-/* Degrade qui balaie lentement le bandeau d'appel a l'action. */
 @keyframes degrade-anime {
   to {
     background-position: 200% center;
@@ -135,27 +174,6 @@ body {
   animation: degrade-anime 8s linear infinite;
 }
 
-/* Barre de progression des etapes : se remplit une fois la section revelee. */
-@keyframes remplir-barre {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.barre-etapes {
-  transform: scaleX(0);
-}
-
-.revelee .barre-etapes {
-  transform-origin: left;
-  animation: remplir-barre 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Squelettes de chargement : un reflet clair balaie le bloc tant que la
-   donnee n'est pas arrivee. */
 @keyframes balayage-squelette {
   to {
     background-position: -200% 0;
@@ -173,10 +191,8 @@ body {
   animation: balayage-squelette 1.4s linear infinite;
 }
 
-/* Pastille du panier qui tressaute a chaque ajout. */
 @keyframes pulsation-panier {
-  0%,
-  100% {
+  0%, 100% {
     transform: scale(1);
   }
   40% {
@@ -188,7 +204,6 @@ body {
   animation: pulsation-panier 0.45s ease-out;
 }
 
-/* Entree des notifications, depuis le bord droit de l'ecran. */
 @keyframes entree-notification {
   from {
     opacity: 0;
@@ -204,6 +219,22 @@ body {
   animation: entree-notification 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Custom Scrollbar Premium */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #047857;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .revelation,
   .entree-hero {
@@ -217,12 +248,7 @@ body {
   .degrade-anime,
   .squelette,
   .pulsation-panier,
-  .entree-notification,
-  .revelee .barre-etapes {
+  .entree-notification {
     animation: none;
-  }
-
-  .barre-etapes {
-    transform: none;
   }
 }

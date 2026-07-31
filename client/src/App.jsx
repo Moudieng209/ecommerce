@@ -1,27 +1,32 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import DispositionBoutique from './layouts/DispositionBoutique';
-import DispositionAdmin from './layouts/DispositionAdmin';
 import RouteProtegee from './components/RouteProtegee';
+import DispositionAdmin from './layouts/DispositionAdmin';
+import DispositionBoutique from './layouts/DispositionBoutique';
+import APropos from './pages/APropos';
 import Accueil from './pages/Accueil';
-import Produits from './pages/Produits';
-import ProduitDetail from './pages/ProduitDetail';
-import Panier from './pages/Panier';
+import CategoriesHub from './pages/CategoriesHub';
 import Commandes from './pages/Commandes';
-import Contact from './pages/Contact';
 import Connexion from './pages/Connexion';
+import Contact from './pages/Contact';
+import Faq from './pages/Faq';
+import Favoris from './pages/Favoris';
 import Inscription from './pages/Inscription';
-import Profil from './pages/Profil';
 import NonTrouvee from './pages/NonTrouvee';
-import TableauDeBord from './pages/admin/TableauDeBord';
-import AdminProduits from './pages/admin/AdminProduits';
+import Nouveautes from './pages/Nouveautes';
+import Offres from './pages/Offres';
+import Packs from './pages/Packs';
+import Panier from './pages/Panier';
+import ProduitDetail from './pages/ProduitDetail';
+import Produits from './pages/Produits';
+import Profil from './pages/Profil';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminCommandes from './pages/admin/AdminCommandes';
-import AdminUtilisateurs from './pages/admin/AdminUtilisateurs';
 import AdminMessages from './pages/admin/AdminMessages';
+import AdminProduits from './pages/admin/AdminProduits';
+import AdminUtilisateurs from './pages/admin/AdminUtilisateurs';
+import TableauDeBord from './pages/admin/TableauDeBord';
 
-// Chaque navigation replace la vue en haut : sans cela, arriver sur une fiche
-// produit depuis le bas d'une liste conserve la position de defilement.
 function RetourEnHaut() {
   const { pathname } = useLocation();
 
@@ -43,6 +48,13 @@ export default function App() {
           <Route index element={<Accueil />} />
           <Route path="produits" element={<Produits />} />
           <Route path="produits/:id" element={<ProduitDetail />} />
+          <Route path="categories" element={<CategoriesHub />} />
+          <Route path="offres" element={<Offres />} />
+          <Route path="nouveautes" element={<Nouveautes />} />
+          <Route path="packs" element={<Packs />} />
+          <Route path="favoris" element={<Favoris />} />
+          <Route path="faq" element={<Faq />} />
+          <Route path="a-propos" element={<APropos />} />
           <Route path="contact" element={<Contact />} />
           <Route path="connexion" element={<Connexion />} />
           <Route path="inscription" element={<Inscription />} />
@@ -90,7 +102,7 @@ export default function App() {
           <Route path="messages" element={<AdminMessages />} />
         </Route>
 
-        {/* Ancienne adresse du site PHP, conservee pour ne pas casser les liens. */}
+        {/* Ancienne adresse du site PHP */}
         <Route path="/index.php" element={<Navigate to="/" replace />} />
         <Route path="*" element={<NonTrouvee />} />
       </Routes>
