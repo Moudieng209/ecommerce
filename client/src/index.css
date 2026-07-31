@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Systeme de design repris de la vitrine SenBus Pro : jetons de couleur
+   Material 3, typographie Inter, Material Symbols, et animations de
+   revelation au defilement. La palette est ici declinee sur le vert de
+   3MT-Shopping (#83e2b6) plutot que sur le bleu SenBus.
+   ===================================================================== */
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-primary: #0f7a53;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #b3f0d5;
+  --color-on-primary-container: #00281a;
+
+  /* Rappel de l'or utilise par la boutique d'origine, pour les accents secondaires. */
+  --color-secondary: #8a5a00;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ffddb0;
+  --color-on-secondary-container: #2c1700;
+
+  /* Vert menthe historique de la marque : badges, soulignements, points d'attention. */
+  --color-accent: #83e2b6;
+
+  --color-background: #f6fbf8;
+  --color-on-background: #0c1b14;
+
+  --color-surface: #f6fbf8;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff6f2;
+  --color-surface-container: #e6efe9;
+  --color-surface-container-high: #dde9e3;
+  --color-surface-container-highest: #d4e3da;
+
+  --color-on-surface: #0c1b14;
+  --color-on-surface-variant: #3f4a44;
+
+  --color-outline: #6f7b74;
+  --color-outline-variant: #c3cfc7;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #410002;
+
+  --color-succes: #1b6b3a;
+  --color-succes-container: #c8f0d5;
+}
+
+body {
+  background-color: var(--color-background);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-family: "Material Symbols Outlined";
+  /* Sans cette regle, l'icone herite de la hauteur de ligne du texte et
+     desaligne verticalement les boutons. */
+  line-height: 1;
+  user-select: none;
+}
+
+/* --- Revelation des sections au defilement -------------------------- */
+/* Pilotee par le composant Revelation, qui pose « revelee » quand le bloc
+   entre dans le champ de vision. Courbe douce a l'arrivee : le bloc
+   decelere en se posant plutot que de s'arreter net. */
+.revelation {
+  opacity: 0;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--delai-revelation, 0ms);
+  will-change: opacity, transform;
+}
+
+.revelation-bas {
+  transform: translateY(28px);
+}
+.revelation-gauche {
+  transform: translateX(-32px);
+}
+.revelation-droite {
+  transform: translateX(32px);
+}
+.revelation-zoom {
+  transform: scale(0.94);
+}
+
+.revelee {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Entree du hero au chargement ----------------------------------- */
+/* Le hero est visible d'emblee : il s'anime au chargement plutot qu'au defilement. */
+@keyframes entree-hero {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.entree-hero {
+  opacity: 0;
+  animation: entree-hero 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--delai-entree, 0ms);
+}
+
+/* Respiration lente des visuels : la page reste vivante meme a l'arret. */
+@keyframes flottement {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.flottement {
+  animation: flottement 6s ease-in-out infinite;
+}
+
+/* Degrade qui balaie lentement le bandeau d'appel a l'action. */
+@keyframes degrade-anime {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.degrade-anime {
+  background-size: 200% 100%;
+  animation: degrade-anime 8s linear infinite;
+}
+
+/* Barre de progression des etapes : se remplit une fois la section revelee. */
+@keyframes remplir-barre {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.barre-etapes {
+  transform: scaleX(0);
+}
+
+.revelee .barre-etapes {
+  transform-origin: left;
+  animation: remplir-barre 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Squelettes de chargement : un reflet clair balaie le bloc tant que la
+   donnee n'est pas arrivee. */
+@keyframes balayage-squelette {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.squelette {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface-container) 0%,
+    var(--color-surface-container-low) 40%,
+    var(--color-surface-container) 60%
+  );
+  background-size: 200% 100%;
+  animation: balayage-squelette 1.4s linear infinite;
+}
+
+/* Pastille du panier qui tressaute a chaque ajout. */
+@keyframes pulsation-panier {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+}
+
+.pulsation-panier {
+  animation: pulsation-panier 0.45s ease-out;
+}
+
+/* Entree des notifications, depuis le bord droit de l'ecran. */
+@keyframes entree-notification {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.entree-notification {
+  animation: entree-notification 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revelation,
+  .entree-hero {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .flottement,
+  .degrade-anime,
+  .squelette,
+  .pulsation-panier,
+  .entree-notification,
+  .revelee .barre-etapes {
+    animation: none;
+  }
+
+  .barre-etapes {
+    transform: none;
+  }
+}

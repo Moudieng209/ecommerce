@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+server/uploads/*
+!server/uploads/.gitkeep
+.DS_Store
+Thumbs.db
+.vite/
+coverage/
