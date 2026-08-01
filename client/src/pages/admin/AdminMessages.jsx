@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import Revelation from '../../components/Revelation';
 import { Bouton, Chargement, EtatVide, Pastille } from '../../components/ui';
+import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { dateHeure } from '../../utils/format';
 
@@ -9,6 +10,7 @@ import { dateHeure } from '../../utils/format';
 
 export default function AdminMessages() {
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
 
   const [messages, setMessages] = useState([]);
   const [nonLus, setNonLus] = useState(0);
@@ -45,7 +47,12 @@ export default function AdminMessages() {
   }
 
   async function supprimer(message) {
-    if (!window.confirm(`Supprimer le message de ${message.prenom} ${message.nom} ?`)) return;
+    const valide = await confirmer({
+      titre: 'Supprimer ce message ?',
+      message: `Le message de ${message.prenom} ${message.nom} sera définitivement effacé.`,
+      libelleConfirmer: 'Supprimer',
+    });
+    if (!valide) return;
 
     try {
       await api.delete(`/messages/${message.id}`);

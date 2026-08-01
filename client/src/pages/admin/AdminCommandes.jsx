@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import Revelation from '../../components/Revelation';
 import { Bouton, CLASSES_SAISIE, Chargement, EtatVide, ImageProduit } from '../../components/ui';
+import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { COULEURS_STATUT, LIBELLES_STATUT, dateHeure, prix as formaterPrix } from '../../utils/format';
 
@@ -12,6 +13,7 @@ const STATUTS = ['En attente', 'Validee', 'Expediee', 'Livree', 'Annulee'];
 
 export default function AdminCommandes() {
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
 
   const [commandes, setCommandes] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
@@ -58,7 +60,12 @@ export default function AdminCommandes() {
   }
 
   async function supprimer(commande) {
-    if (!window.confirm(`Supprimer définitivement la commande ${commande.reference} ?`)) return;
+    const valide = await confirmer({
+      titre: 'Supprimer cette commande ?',
+      message: `La commande ${commande.reference} et son détail seront définitivement effacés de l’historique.`,
+      libelleConfirmer: 'Supprimer',
+    });
+    if (!valide) return;
 
     try {
       await api.delete(`/commandes/${commande.id}`);

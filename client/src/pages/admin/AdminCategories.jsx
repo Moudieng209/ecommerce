@@ -3,11 +3,13 @@ import { api } from '../../api/client';
 import Modale from '../../components/Modale';
 import Revelation from '../../components/Revelation';
 import { Bouton, Champ, CLASSES_SAISIE, Chargement, EtatVide, Pastille } from '../../components/ui';
+import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { date } from '../../utils/format';
 
 export default function AdminCategories() {
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
 
   const [categories, setCategories] = useState([]);
   const [chargement, setChargement] = useState(true);
@@ -65,12 +67,15 @@ export default function AdminCategories() {
   }
 
   async function supprimer(categorie) {
-    const message =
-      categorie.nombre_produits > 0
-        ? `« ${categorie.nom} » contient ${categorie.nombre_produits} produit(s). Ils resteront au catalogue, sans catégorie. Continuer ?`
-        : `Supprimer la catégorie « ${categorie.nom} » ?`;
-
-    if (!window.confirm(message)) return;
+    const valide = await confirmer({
+      titre: 'Supprimer cette catégorie ?',
+      message:
+        categorie.nombre_produits > 0
+          ? `« ${categorie.nom} » contient ${categorie.nombre_produits} produit(s). Ils resteront au catalogue, mais sans catégorie.`
+          : `La catégorie « ${categorie.nom} » sera définitivement supprimée.`,
+      libelleConfirmer: 'Supprimer',
+    });
+    if (!valide) return;
 
     try {
       await api.delete(`/categories/${categorie.id}`);

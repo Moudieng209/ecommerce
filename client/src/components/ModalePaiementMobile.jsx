@@ -269,7 +269,9 @@ export default function ModalePaiementMobile({
           {etape === 'otp' && (
             <form onSubmit={validerOTP} className="space-y-4 text-center">
               <div className="rounded-2xl bg-sky-50 p-4 border border-sky-200">
-                <span className="text-3xl">📱</span>
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500 text-white">
+                  <span className="material-symbols-outlined text-[26px]">smartphone</span>
+                </span>
                 <p className="mt-2 text-xs font-bold text-sky-900">
                   Un code de confirmation SMS a été envoyé au {telephone || '+221 77 ••• •• ••'}.
                 </p>
@@ -301,8 +303,8 @@ export default function ModalePaiementMobile({
           {/* Etape 4: Succès */}
           {etape === 'succes' && (
             <div className="py-8 flex flex-col items-center justify-center text-center space-y-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-succes-container text-succes text-3xl">
-                ✓
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-succes-container text-succes">
+                <span className="material-symbols-outlined text-[34px]">check</span>
               </div>
               <h4 className="text-lg font-extrabold text-on-surface">Paiement Accepté !</h4>
               <p className="text-xs text-outline">

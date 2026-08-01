@@ -7,6 +7,7 @@ import ModalePaiementMobile from '../components/ModalePaiementMobile';
 import Revelation from '../components/Revelation';
 import { Bouton, Champ, Chargement, EtatVide, ImageProduit } from '../components/ui';
 import { useAuth } from '../contexts/AuthContext';
+import { useConfirmation } from '../contexts/ConfirmationContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { usePanier } from '../contexts/PanierContext';
 import { PRODUITS_ENRICHIS } from '../data/produitsData';
@@ -16,6 +17,7 @@ export default function Panier() {
   const { articles, resume, chargement, changerQuantite, retirer, vider, recharger } = usePanier();
   const { utilisateur } = useAuth();
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
   const navigate = useNavigate();
 
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
@@ -121,8 +123,13 @@ export default function Panier() {
           <Bouton
             variante="secondaire"
             icone="delete_sweep"
-            onClick={() => {
-              if (window.confirm('Vider entièrement votre panier ?')) vider();
+            onClick={async () => {
+              const valide = await confirmer({
+                titre: 'Vider le panier ?',
+                message: 'Tous les articles de votre panier seront retirés. Cette action est irréversible.',
+                libelleConfirmer: 'Vider le panier',
+              });
+              if (valide) vider();
             }}
           >
             Vider le panier

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import LogoPaiement from './LogosPaiement';
 
 export const EMAIL_CONTACT = 'contact@3mt-shopping.sn';
 export const TELEPHONE_CONTACT = '+221 77 000 00 00';
@@ -204,10 +205,20 @@ export default function PiedDePage() {
             <div className="mt-5 pt-4 border-t border-outline-variant/40">
               <p className="text-[11px] font-bold text-on-surface mb-2">Paiements Sécurisés :</p>
               <div className="flex flex-wrap gap-1.5 text-[10px] font-bold text-on-surface-variant">
-                <span className="rounded bg-surface-container-high px-2 py-1">Wave</span>
-                <span className="rounded bg-surface-container-high px-2 py-1">Orange Money</span>
-                <span className="rounded bg-surface-container-high px-2 py-1">Carte Bancaire</span>
-                <span className="rounded bg-surface-container-high px-2 py-1">À la livraison</span>
+                {[
+                  { cle: 'wave', libelle: 'Wave' },
+                  { cle: 'orange-money', libelle: 'Orange Money' },
+                  { cle: 'carte', libelle: 'Carte Bancaire' },
+                  { cle: 'especes', libelle: 'À la livraison' },
+                ].map((moyen) => (
+                  <span
+                    key={moyen.cle}
+                    className="inline-flex items-center gap-1.5 rounded bg-surface-container-high py-1 pl-1 pr-2"
+                  >
+                    <LogoPaiement cle={moyen.cle} className="h-5 w-5" />
+                    {moyen.libelle}
+                  </span>
+                ))}
               </div>
             </div>
           </div>

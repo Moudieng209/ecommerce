@@ -4,6 +4,7 @@ import Modale from '../../components/Modale';
 import Revelation from '../../components/Revelation';
 import { Bouton, Champ, CLASSES_SAISIE, Chargement, EtatVide, Pastille } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { date } from '../../utils/format';
 
@@ -23,6 +24,7 @@ const FORMULAIRE_VIDE = {
 export default function AdminUtilisateurs() {
   const { utilisateur: moi } = useAuth();
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
 
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [chargement, setChargement] = useState(true);
@@ -111,7 +113,12 @@ export default function AdminUtilisateurs() {
   }
 
   async function supprimer(compte) {
-    if (!window.confirm(`Supprimer le compte de ${compte.prenom} ${compte.nom} ?`)) return;
+    const valide = await confirmer({
+      titre: 'Supprimer ce compte ?',
+      message: `Le compte de ${compte.prenom} ${compte.nom} sera supprimé, ainsi que ses commandes. Cette action est irréversible.`,
+      libelleConfirmer: 'Supprimer',
+    });
+    if (!valide) return;
 
     try {
       await api.delete(`/utilisateurs/${compte.id}`);

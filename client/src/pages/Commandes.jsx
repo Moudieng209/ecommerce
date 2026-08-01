@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import Revelation from '../components/Revelation';
 import { Bouton, Chargement, EtatVide, ImageProduit, Pastille } from '../components/ui';
+import { useConfirmation } from '../contexts/ConfirmationContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { COULEURS_STATUT, LIBELLES_STATUT, dateHeure, prix as formaterPrix } from '../utils/format';
 
@@ -13,6 +14,7 @@ const ETAPES_SUIVI = ['En attente', 'Validee', 'Expediee', 'Livree'];
 
 export default function Commandes() {
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
 
   const [commandes, setCommandes] = useState([]);
   const [chargement, setChargement] = useState(true);
@@ -27,7 +29,13 @@ export default function Commandes() {
   }, []);
 
   async function annuler(commande) {
-    if (!window.confirm(`Annuler la commande ${commande.reference} ?`)) return;
+    const valide = await confirmer({
+      titre: 'Annuler cette commande ?',
+      message: `La commande ${commande.reference} sera annulée et les articles retourneront en stock.`,
+      libelleConfirmer: 'Annuler la commande',
+      libelleAnnuler: 'Conserver',
+    });
+    if (!valide) return;
 
     try {
       const donnees = await api.post(`/commandes/${commande.id}/annuler`);

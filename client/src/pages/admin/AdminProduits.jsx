@@ -3,6 +3,7 @@ import { api, urlMedia } from '../../api/client';
 import Modale from '../../components/Modale';
 import Revelation from '../../components/Revelation';
 import { Bouton, Champ, CLASSES_SAISIE, Chargement, EtatVide, ImageProduit, Pastille } from '../../components/ui';
+import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { prix as formaterPrix } from '../../utils/format';
 
@@ -20,6 +21,7 @@ const FORMULAIRE_VIDE = {
 
 export default function AdminProduits() {
   const { succes, erreur: notifierErreur } = useNotifications();
+  const confirmer = useConfirmation();
 
   const [produits, setProduits] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -125,7 +127,12 @@ export default function AdminProduits() {
   }
 
   async function supprimer(produit) {
-    if (!window.confirm(`Supprimer définitivement « ${produit.nom} » ?`)) return;
+    const valide = await confirmer({
+      titre: 'Supprimer ce produit ?',
+      message: `« ${produit.nom} » sera définitivement retiré du catalogue. Cette action est irréversible.`,
+      libelleConfirmer: 'Supprimer',
+    });
+    if (!valide) return;
 
     try {
       await api.delete(`/produits/${produit.id}`);
