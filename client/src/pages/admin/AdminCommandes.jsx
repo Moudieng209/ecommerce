@@ -5,6 +5,7 @@ import { Bouton, CLASSES_SAISIE, Chargement, EtatVide, ImageProduit } from '../.
 import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { COULEURS_STATUT, LIBELLES_STATUT, dateHeure, prix as formaterPrix } from '../../utils/format';
+import { exporterCSV } from '../../utils/exportCsv';
 
 // Suivi des commandes : filtre par statut, recherche, changement d'etat et
 // suppression. L'annulation restitue le stock cote serveur.
@@ -76,14 +77,36 @@ export default function AdminCommandes() {
     }
   }
 
+  function exporterCommandes() {
+    exporterCSV(
+      commandes,
+      [
+        { libelle: 'Référence', valeur: (c) => c.reference },
+        { libelle: 'Client', valeur: (c) => `${c.prenom} ${c.nom}` },
+        { libelle: 'Email', valeur: (c) => c.email },
+        { libelle: 'Date', valeur: (c) => dateHeure(c.cree_le) },
+        { libelle: 'Total (CFA)', valeur: (c) => c.total },
+        { libelle: 'Statut', valeur: (c) => LIBELLES_STATUT[c.statut] },
+        { libelle: 'Adresse', valeur: (c) => c.adresse_livraison || 'Non renseignée' },
+      ],
+      'commandes'
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <Revelation>
-        <h1 className="text-2xl font-extrabold tracking-tight text-on-surface">Commandes</h1>
-        <p className="mt-1.5 text-sm text-on-surface-variant">
-          {pagination.total} commande{pagination.total > 1 ? 's' : ''} enregistrée
-          {pagination.total > 1 ? 's' : ''}.
-        </p>
+      <Revelation className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-on-surface">Commandes</h1>
+          <p className="mt-1.5 text-sm text-on-surface-variant">
+            {pagination.total} commande{pagination.total > 1 ? 's' : ''} enregistrée
+            {pagination.total > 1 ? 's' : ''}.
+          </p>
+        </div>
+
+        <Bouton icone="download" variante="secondaire" onClick={exporterCommandes} disabled={commandes.length === 0}>
+          Exporter CSV
+        </Bouton>
       </Revelation>
 
       <div className="flex flex-wrap gap-3">

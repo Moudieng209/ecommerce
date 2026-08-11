@@ -6,6 +6,7 @@ import { Bouton, Champ, CLASSES_SAISIE, Chargement, EtatVide, ImageProduit, Past
 import { useConfirmation } from '../../contexts/ConfirmationContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { prix as formaterPrix } from '../../utils/format';
+import { exporterCSV } from '../../utils/exportCsv';
 
 // CRUD des produits, avec televersement d'image. Le formulaire part en
 // multipart : le fichier accompagne les champs texte dans la meme requete.
@@ -27,6 +28,7 @@ export default function AdminProduits() {
   const [categories, setCategories] = useState([]);
   const [chargement, setChargement] = useState(true);
   const [recherche, setRecherche] = useState('');
+  const [selection, setSelection] = useState([]);
 
   const [modaleOuverte, setModaleOuverte] = useState(false);
   const [enEdition, setEnEdition] = useState(null);
@@ -55,6 +57,10 @@ export default function AdminProduits() {
       setChargement(false);
     }
   }, [recherche, notifierErreur]);
+
+  useEffect(() => {
+    setSelection([]);
+  }, [produits]);
 
   useEffect(() => {
     const minuterie = setTimeout(charger, 300);
@@ -143,6 +149,55 @@ export default function AdminProduits() {
     }
   }
 
+  function gererSelection(id) {
+    setSelection((prec) =>
+      prec.includes(id) ? prec.filter((s) => s !== id) : [...prec, id]
+    );
+  }
+
+  function gererSelectionTout() {
+    if (selection.length === produits.length) {
+      setSelection([]);
+    } else {
+      setSelection(produits.map((p) => p.id));
+    }
+  }
+
+  async function supprimerSelection() {
+    const valide = await confirmer({
+      titre: 'Supprimer la sélection ?',
+      message: `${selection.length} produit(s) seront supprimés. Cette action est irréversible.`,
+      libelleConfirmer: 'Supprimer tout',
+    });
+    if (!valide) return;
+
+    setChargement(true);
+    try {
+      await Promise.all(selection.map((id) => api.delete(`/produits/${id}`)));
+      succes(`${selection.length} produit(s) supprimé(s).`);
+      charger();
+    } catch (erreur) {
+      notifierErreur("Une erreur est survenue lors de la suppression groupée.");
+      charger();
+    }
+  }
+
+  function exporterProduits() {
+    exporterCSV(
+      produits,
+      [
+        { libelle: 'ID', valeur: (p) => p.id },
+        { libelle: 'Nom', valeur: (p) => p.nom },
+        { libelle: 'Catégorie', valeur: (p) => p.categorie_nom || '' },
+        { libelle: 'Prix', valeur: (p) => p.prix },
+        { libelle: 'Stock', valeur: (p) => p.stock },
+        { libelle: 'Actif', valeur: (p) => (p.actif ? 'Oui' : 'Non') },
+        { libelle: 'Description', valeur: (p) => p.description || '' },
+      ],
+      'produits'
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Revelation className="flex flex-wrap items-end justify-between gap-4">
@@ -153,9 +208,19 @@ export default function AdminProduits() {
           </p>
         </div>
 
-        <Bouton icone="add" onClick={ouvrirCreation}>
-          Nouveau produit
-        </Bouton>
+        <div className="flex flex-wrap items-center gap-2">
+          {selection.length > 0 && (
+            <Bouton icone="delete" variante="danger" onClick={supprimerSelection}>
+              Supprimer ({selection.length})
+            </Bouton>
+          )}
+          <Bouton icone="download" variante="secondaire" onClick={exporterProduits}>
+            Exporter CSV
+          </Bouton>
+          <Bouton icone="add" onClick={ouvrirCreation}>
+            Nouveau produit
+          </Bouton>
+        </div>
       </Revelation>
 
       <div className="relative max-w-sm">
@@ -189,6 +254,14 @@ export default function AdminProduits() {
             <table className="w-full min-w-[46rem] text-sm">
               <thead className="border-b border-outline-variant bg-surface-container-low/60 text-left">
                 <tr className="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      checked={selection.length === produits.length && produits.length > 0}
+                      onChange={gererSelectionTout}
+                      className="h-4 w-4 rounded border-outline-variant accent-primary focus:ring-primary"
+                    />
+                  </th>
                   <th className="px-4 py-3">Produit</th>
                   <th className="px-4 py-3">Catégorie</th>
                   <th className="px-4 py-3">Prix</th>
@@ -200,7 +273,20 @@ export default function AdminProduits() {
 
               <tbody className="divide-y divide-outline-variant/60">
                 {produits.map((produit) => (
-                  <tr key={produit.id} className="transition-colors hover:bg-surface-container-low/40">
+                  <tr
+                    key={produit.id}
+                    className={`transition-colors hover:bg-surface-container-low/40 ${
+                      selection.includes(produit.id) ? 'bg-primary-container/20' : ''
+                    }`}
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selection.includes(produit.id)}
+                        onChange={() => gererSelection(produit.id)}
+                        className="h-4 w-4 rounded border-outline-variant accent-primary focus:ring-primary"
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <ImageProduit

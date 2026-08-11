@@ -99,6 +99,12 @@ export function Chargement({ libelle = 'Chargement…' }) {
   );
 }
 
+export function Squelette({ className = '' }) {
+  return (
+    <div className={`animate-pulse rounded-xl bg-surface-container-high/50 ${className}`} />
+  );
+}
+
 export function EtatVide({ icone = 'inbox', titre, texte, action = null }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-outline-variant bg-surface-container-low/40 px-6 py-16 text-center">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client';
 import Revelation from '../../components/Revelation';
-import { Chargement, ImageProduit, Pastille } from '../../components/ui';
+import { Chargement, ImageProduit, Pastille, Squelette } from '../../components/ui';
 import { COULEURS_STATUT, LIBELLES_STATUT, dateHeure, prix as formaterPrix } from '../../utils/format';
 
 // Tableau de bord : indicateurs, ventes des 14 derniers jours, meilleures
@@ -21,7 +21,40 @@ export default function TableauDeBord() {
       .finally(() => setChargement(false));
   }, []);
 
-  if (chargement) return <Chargement libelle="Chargement des statistiques…" />;
+  if (chargement) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <Squelette className="h-8 w-48 mb-2" />
+          <Squelette className="h-4 w-64" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="flex items-center gap-4 rounded-2xl border border-outline-variant bg-surface-container-lowest p-5">
+              <Squelette className="h-12 w-12 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Squelette className="h-3 w-20" />
+                <Squelette className="h-6 w-32" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+          <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6">
+            <Squelette className="h-6 w-48 mb-6" />
+            <Squelette className="h-48 w-full" />
+          </div>
+          <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6">
+            <Squelette className="h-6 w-48 mb-6" />
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => <Squelette key={i} className="h-8 w-full" />)}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!donnees) return <p className="text-on-surface-variant">Statistiques indisponibles.</p>;
 
   const { totaux, parStatut, dernieresCommandes, meilleursProduits, ventesParJour, stockFaible } = donnees;
