@@ -615,7 +615,6 @@ export const AVIS_CLIENTS = [
     note: 5,
     commentaire: 'Excellente qualité des vêtements et livraison ultra rapide à Dakar ! La chemise Oxford et la veste en cuir taillent parfaitement.',
     date: 'Il y a 2 jours',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
   },
   {
     id: 2,
@@ -624,7 +623,6 @@ export const AVIS_CLIENTS = [
     note: 5,
     commentaire: 'J’ai réglé ma commande par Wave en 1 clic. Le Parfum Signature Nuit d’Orient et l’Argan Bio sentent divinement bon.',
     date: 'Il y a 4 jours',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   },
   {
     id: 3,
@@ -633,6 +631,5 @@ export const AVIS_CLIENTS = [
     note: 5,
     commentaire: 'J’ai acheté le Pack Executive avec le costume et la montre chronographe. Qualité incroyable pour le prix et livraison 48h respectée !',
     date: 'Il y a 1 semaine',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
   },
 ];

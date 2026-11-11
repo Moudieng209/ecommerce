@@ -417,7 +417,12 @@ export default function Accueil() {
                   </div>
 
                   <div className="mt-6 flex items-center gap-3 border-t border-outline-variant/40 pt-4">
-                    <img src={avis.avatar} alt={avis.nom} className="h-10 w-10 rounded-full object-cover" />
+                    <div
+                      aria-hidden="true"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-xs font-semibold text-on-surface-variant"
+                    >
+                      {avis.nom.split(' ').map((partie) => partie[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
                     <div>
                       <p className="text-xs font-bold text-on-surface">{avis.nom}</p>
                       <p className="text-[10px] text-outline">{avis.role} • {avis.date}</p>
